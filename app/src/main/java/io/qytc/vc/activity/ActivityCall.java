@@ -182,7 +182,7 @@ public class ActivityCall extends Activity implements View.OnClickListener {
             case UIEventStatus.END_CONF:
                 cancelCall();
             case UIEventStatus.JPUSH_REFUSE_CALL:
-                ToastUtils.toast(ActivityCall.this, R.string.target_user_is_busy,false);
+                ToastUtils.toast(ActivityCall.this, R.string.target_user_is_busy);
                 cancelCall();
                 break;
             case UIEventStatus.JPUSH_ACCEPT_CALL:

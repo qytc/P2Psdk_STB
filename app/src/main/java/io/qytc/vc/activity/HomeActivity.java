@@ -104,7 +104,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         mTargetNumber = mEtTargetNumber.getText().toString().trim();
 
         if (TextUtils.isEmpty(mTargetNumber)) {
-            ToastUtils.toast(this, R.string.please_input_number,false);
+            ToastUtils.toast(this, R.string.please_input_number);
             return;
         }
 

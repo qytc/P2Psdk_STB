@@ -4,80 +4,51 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.Nullable;
 
 import com.ml.android.eventcore.EventBusUtil;
 import com.ml.android.eventcore.ResponseEvent;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 import io.qytc.vc.R;
 import io.qytc.vc.constant.SpConstant;
 import io.qytc.vc.http.DoHttpManager;
 import io.qytc.vc.http.ResponseEventStatus;
 import io.qytc.vc.http.response.LoginResponse;
 import io.qytc.vc.service.SocketConnectService;
+import io.qytc.vc.utils.CmdUtil;
 import io.qytc.vc.utils.SpUtil;
 import io.qytc.vc.utils.ToastUtils;
 
-public class MainActivity extends Activity {
+public class LoginActivity extends Activity {
 
-    @BindView(R.id.login_ed)
-    EditText loginEd;
-    @BindView(R.id.pwd_ed)
-    EditText pwdEd;
-    @BindView(R.id.cancel_btn)
-    Button cancelBtn;
-    @BindView(R.id.login_btn)
-    Button loginBtn;
-    @BindView(R.id.tv_login_tip)
-    TextView tvLoginTip;
+    private TextView mTvLoginTip;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
+
+        setContentView(R.layout.activity_login);
+
+        mTvLoginTip = findViewById(R.id.tv_login_tip);
+
         EventBusUtil.register(this);
+
+        login();
     }
 
-    @OnClick({R.id.cancel_btn, R.id.login_btn})
-    public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.cancel_btn:
-                finish();
-                break;
-            case R.id.login_btn:
-                String loginStr = loginEd.getText().toString().trim();
-                if (TextUtils.isEmpty(loginStr)) {
-                    ToastUtils.toast(MainActivity.this, "请输入终端或手机号", false);
-                    return;
-                }
-                String pwdStr = pwdEd.getText().toString().trim();
-                if (TextUtils.isEmpty(pwdStr)) {
-                    ToastUtils.toast(MainActivity.this, "请输入密码", false);
-                    return;
-                }
-                login(loginStr, pwdStr);
-                break;
+    private void login() {
+        String cardNo = CmdUtil.getCardNo();
+
+        if (TextUtils.isEmpty(cardNo)) {
+            ToastUtils.toast(this, R.string.no_IC_card_num);
+            mTvLoginTip.setText(R.string.no_IC_card_num);
+            return;
         }
-    }
-
-    private void login(String loginStr, String pwdStr) {
+        String password = "qytc@123";
         String deviceId = SpUtil.getString(this, SpConstant.JPUSH_DEVICE_ID);
-        DoHttpManager.getInstance().auth(this, loginStr, pwdStr, deviceId);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        EventBusUtil.unregister(this);
+        DoHttpManager.getInstance().auth(this, cardNo, password, deviceId);
     }
 
     public void onEventMainThread(ResponseEvent event) {
@@ -110,19 +81,25 @@ public class MainActivity extends Activity {
 
                 startService(new Intent(this, SocketConnectService.class));
 
-                ToastUtils.toast(this, R.string.login_success, false);
+                ToastUtils.toast(this, R.string.login_success);
 
                 startActivity(new Intent(this, HomeActivity.class));
                 finish();
                 break;
             case ResponseEventStatus.UNREGISTERED:
-                ToastUtils.toast(this, R.string.unregister, false);
-                tvLoginTip.setText(R.string.unregister);
+                ToastUtils.toast(this, R.string.unregister);
+                mTvLoginTip.setText(R.string.unregister);
                 break;
             case ResponseEventStatus.ERROR:
-                ToastUtils.toast(this, event.getMessage(), false);
-                tvLoginTip.setText(event.getMessage());
+                ToastUtils.toast(this, event.getMessage());
+                mTvLoginTip.setText(event.getMessage());
                 break;
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBusUtil.unregister(this);
     }
 }

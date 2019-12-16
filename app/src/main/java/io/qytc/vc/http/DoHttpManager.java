@@ -53,7 +53,7 @@ public class DoHttpManager {
 
                     @Override
                     public void onError(ExceptionHandle.ResponeThrowable responeThrowable) {
-                        ToastUtils.toast(activity, responeThrowable.message,false);
+                        ToastUtils.toast(activity, responeThrowable.message);
                         LoadingDialogUtil.dismiss();
 
                         ResponseEvent event = new ResponseEvent(ResponseEventStatus.LOGIN_ID);
@@ -75,7 +75,7 @@ public class DoHttpManager {
                                 event.setStatus(ResponseEventStatus.UNREGISTERED);
                                 event.setMessage(loginResponse.getMsg());
                             } else {
-                                ToastUtils.toast(activity, loginResponse.getMsg(),false);
+                                ToastUtils.toast(activity, loginResponse.getMsg());
                                 event.setStatus(ResponseEventStatus.ERROR);
                                 event.setMessage(loginResponse.getMsg());
                             }
@@ -108,7 +108,7 @@ public class DoHttpManager {
 
                     @Override
                     public void onError(ExceptionHandle.ResponeThrowable responseThrowable) {
-                        ToastUtils.toast(activity, responseThrowable.message,false);
+                        ToastUtils.toast(activity, responseThrowable.message);
                         SpUtil.saveString(activity, SpConstant.INROOM, "0");
                         SocketConnectService.getInstance().sendALiveData();
                     }
@@ -123,8 +123,8 @@ public class DoHttpManager {
                         if (!creatConfResponse.getCode().equalsIgnoreCase("0")) {
                             SpUtil.saveString(activity, SpConstant.INROOM, "0");
                             SocketConnectService.getInstance().sendALiveData();
-                            ToastUtils.toast(activity, creatConfResponse.getMsg(),false);
-                        }else {
+                            ToastUtils.toast(activity, creatConfResponse.getMsg());
+                        } else {
                             ResponseEvent event = new ResponseEvent(ResponseEventStatus.CREAT_P2PCALL);
                             event.setStatus(ResponseEventStatus.OK);
                             event.setData(creatConfResponse);
@@ -152,7 +152,7 @@ public class DoHttpManager {
 
                     @Override
                     public void onError(ExceptionHandle.ResponeThrowable responseThrowable) {
-                        ToastUtils.toast(activity, responseThrowable.message,false);
+                        ToastUtils.toast(activity, responseThrowable.message);
                     }
 
                     @Override

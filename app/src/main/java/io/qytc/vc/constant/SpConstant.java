@@ -12,27 +12,6 @@ public interface SpConstant {
     String SP_FILENAME = "sp_filename";
 
     /**
-     * 云台提示记录
-     */
-    String CAMERA_CONTROL_TIP = "camera_control_tip";
-    /**
-     * 服务器端口
-     */
-    String SERVER_PORT = "server_port";
-    /**
-     * 服务器路径
-     */
-    String SERVER_RUL = "server_url";
-    /**
-     * 服务器api完整路径
-     */
-    String BASE_URL = "base_url";
-    /**
-     * socket地址
-     */
-    String KEEP_ALIVE_URL = "keep_alive_url";
-
-    /**
      * 极光推送ID
      */
     String JPUSH_DEVICE_ID = "jpush_device_id";
@@ -43,9 +22,9 @@ public interface SpConstant {
     String APP_ID = "1400210901";
 
     /**
-     * 4-专业终端
+     * 1-机顶盒
      */
-    int type = 2;
+    int type = 1;
 
     /**
      * accessToken
@@ -135,7 +114,7 @@ public interface SpConstant {
     String MIC = "Mic";
 
     /**
-     *
+     * socketID
      */
     String SOCKETID = "SocketId";
 
@@ -163,22 +142,4 @@ public interface SpConstant {
      * 绑定的终端ID
      */
     String BINDTERM = "bindTerm";
-
-    /**
-     * 重要会议标识
-     */
-    String MAIN_CONFERENCE = "maincConference";
-    /**
-     * 音频输入标识
-     */
-    String AUDIO_INPUT = "audioInput";
-    /**
-     * 音频输出标识
-     */
-    String AUDIO_OUTPUT = "audioOutput";
-    String AUDIO_OUT = "Audio-Out";
-    String HDMI = "HDMI";
-    String USB = "USB";
-
-
 }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">P2PCallDemo_Mobile</string>
+    <string name="app_name">P2PCallDemo_STB</string>
     <string name="no_IC_card_num">未检测到IC卡号</string>
     <string name="login_success">登陆成功</string>
     <string name="unregister">终端未注册，请联系管理员</string>

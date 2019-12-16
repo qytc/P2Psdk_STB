@@ -21,8 +21,8 @@ import com.tencent.trtc.TRTCCloudListener;
 
 import java.lang.ref.WeakReference;
 
-import io.qytc.vc.TRTCApplication;
 import io.qytc.vc.R;
+import io.qytc.vc.TRTCApplication;
 import io.qytc.vc.constant.SpConstant;
 import io.qytc.vc.http.DoHttpManager;
 import io.qytc.vc.http.UIEventStatus;
@@ -106,7 +106,7 @@ public class ActivityVideo extends Activity {
             Log.i(TAG, "--onError() , errCode = " + errCode + " errMsg =" + errMsg);
             ActivityVideo activity = mContext.get();
             if (activity != null) {
-                ToastUtils.toast(activity, "发生错误: " + errMsg + "[" + errCode + "]",false);
+                ToastUtils.toast(activity, "发生错误: " + errMsg + "[" + errCode + "]");
                 if (errCode == TXLiteAVCode.ERR_ROOM_ENTER_FAIL) {  //严重错误，退出房间
                     activity.exitRoom();
                 }
@@ -197,12 +197,12 @@ public class ActivityVideo extends Activity {
 
         switch (event.getId()) {
             case UIEventStatus.END_CONF:
-                ToastUtils.toast(mActivity, getString(R.string.call_has_ended),false);
+                ToastUtils.toast(mActivity, getString(R.string.call_has_ended));
                 exitRoom();
                 break;
             case UIEventStatus.CONF_AUTO_CLOSE_NOTICE:
                 String message = event.getData();
-                ToastUtils.toast(mActivity, message,false);
+                ToastUtils.toast(mActivity, message);
                 break;
         }
     }
