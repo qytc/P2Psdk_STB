@@ -45,7 +45,7 @@
             android:value="31ca00fa90b4732ff64f886b" />
 
         <activity
-            android:name=".activity.LoginActivity"
+            android:name="io.qytc.p2psdk.activity.LoginActivity"
             android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -54,15 +54,15 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.HomeActivity"
+            android:name="io.qytc.p2psdk.activity.HomeActivity"
             android:launchMode="singleInstance"
             android:screenOrientation="landscape" />
         <activity
-            android:name=".activity.ActivityCall"
+            android:name="io.qytc.p2psdk.activity.ActivityCall"
             android:launchMode="singleInstance"
             android:screenOrientation="landscape" />
         <activity
-            android:name=".activity.ActivityVideo"
+            android:name="io.qytc.p2psdk.activity.ActivityVideo"
             android:launchMode="singleInstance"
             android:screenOrientation="landscape" />
 
@@ -94,7 +94,7 @@
         <!-- Since JCore2.0.0 Required SDK核心功能-->
         <!-- 这个Service要继承JCommonService -->
         <service
-            android:name=".service.PushService"
+            android:name="io.qytc.p2psdk.service.PushService"
             android:enabled="true"
             android:exported="false"
             android:process=":pushcore">
@@ -102,10 +102,10 @@
                 <action android:name="cn.jiguang.user.service.action" />
             </intent-filter>
         </service>
-        <service android:name=".service.SocketConnectService" />
+        <service android:name="io.qytc.p2psdk.service.SocketConnectService" />
         <!-- User defined.  For test only  用户自定义的广播接收器-->
         <receiver
-            android:name=".receiver.MsgReceiver"
+            android:name="io.qytc.p2psdk.receiver.MsgReceiver"
             android:enabled="true"
             android:exported="false">
             <intent-filter>
