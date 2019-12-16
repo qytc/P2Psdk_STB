@@ -1,4 +1,5 @@
 package io.qytc.vc;
+
 import android.os.Bundle;
 
 import androidx.multidex.MultiDexApplication;
@@ -9,6 +10,7 @@ import com.tencent.trtc.TRTCCloudDef;
 import cn.jiguang.api.JCoreManager;
 import cn.jpush.android.api.JPushInterface;
 import io.qytc.vc.constant.SpConstant;
+import io.qytc.vc.utils.Check;
 import io.qytc.vc.utils.SpUtil;
 
 public class TRTCApplication extends MultiDexApplication {
@@ -36,6 +38,13 @@ public class TRTCApplication extends MultiDexApplication {
             encParam.videoResolution = TRTCCloudDef.TRTC_VIDEO_RESOLUTION_960_540;//分辨率
             encParam.videoFps = 15;//帧率
             encParam.videoBitrate = 1500;//码率
+
+            if (!Check.supportHD()) {//如果不支持
+                encParam.videoResolution = TRTCCloudDef.TRTC_VIDEO_RESOLUTION_240_180;
+                encParam.videoFps = 5;
+                encParam.videoBitrate = 500;
+            }
+
             encParam.videoResolutionMode = TRTCCloudDef.TRTC_VIDEO_RESOLUTION_MODE_LANDSCAPE;
             mTrtcCloud.setVideoEncoderParam(encParam);
 

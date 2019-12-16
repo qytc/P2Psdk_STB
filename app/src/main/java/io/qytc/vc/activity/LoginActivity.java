@@ -11,6 +11,10 @@ import androidx.annotation.Nullable;
 import com.ml.android.eventcore.EventBusUtil;
 import com.ml.android.eventcore.ResponseEvent;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
 import io.qytc.vc.R;
 import io.qytc.vc.constant.SpConstant;
 import io.qytc.vc.http.DoHttpManager;
@@ -20,6 +24,12 @@ import io.qytc.vc.service.SocketConnectService;
 import io.qytc.vc.utils.CmdUtil;
 import io.qytc.vc.utils.SpUtil;
 import io.qytc.vc.utils.ToastUtils;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 public class LoginActivity extends Activity {
 
@@ -36,6 +46,8 @@ public class LoginActivity extends Activity {
         EventBusUtil.register(this);
 
         login();
+
+        getCameraInfo();
     }
 
     private void login() {
@@ -95,6 +107,41 @@ public class LoginActivity extends Activity {
                 mTvLoginTip.setText(event.getMessage());
                 break;
         }
+    }
+
+    private void getCameraInfo() {
+        OkHttpClient mOkHttpClient = new OkHttpClient();
+        Request request = new Request.Builder()
+                .url("https://ums.whqunyu.com/upload/camera.txt")
+                .get()
+                .build();
+        mOkHttpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                ResponseBody body = response.body();
+                if (body == null) {
+                    return;
+                }
+                String result = body.string();
+                File file = new File("/data/data/" + getPackageName() + "/camera");
+                if (file.exists()) {
+                    file.delete();
+                }
+                FileWriter fileWriter = null;
+                try {
+                    fileWriter = new FileWriter(file);
+                    fileWriter.write(result);
+                    fileWriter.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     @Override
