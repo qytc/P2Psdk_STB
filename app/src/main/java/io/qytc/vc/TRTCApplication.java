@@ -1,23 +1,19 @@
 package io.qytc.vc;
 
-import androidx.multidex.MultiDexApplication;
+import android.app.Application;
 
 import io.qytc.p2psdk.SDKCore;
+import io.qytc.p2psdk.utils.CmdUtil;
 
 
-public class TRTCApplication extends MultiDexApplication {
-
-    public static TRTCApplication mInstance;
-    private SDKCore sdkCore;
+public class TRTCApplication extends Application {
 
     @Override
     public void onCreate() {
         super.onCreate();
-        mInstance = this;
-        sdkCore=new SDKCore(mInstance);
-        sdkCore.initJpush();
+        SDKCore sdkCore = new SDKCore(this);
+
+        String cardNo = CmdUtil.getCardNo();
+        sdkCore.Login(cardNo);
     }
-
-
-
 }

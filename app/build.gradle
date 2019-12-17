@@ -35,7 +35,5 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
 
     implementation project(path: ':p2psdk')
-    implementation 'com.android.support:multidex:1.0.3'
-
 
 }

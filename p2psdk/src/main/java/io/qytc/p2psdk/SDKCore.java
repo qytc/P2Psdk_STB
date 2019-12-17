@@ -9,7 +9,9 @@ import com.tencent.trtc.TRTCCloudDef;
 import cn.jiguang.api.JCoreManager;
 import cn.jpush.android.api.JPushInterface;
 import io.qytc.p2psdk.constant.SpConstant;
+import io.qytc.p2psdk.http.DoHttpManager;
 import io.qytc.p2psdk.utils.Check;
+import io.qytc.p2psdk.utils.CmdUtil;
 import io.qytc.p2psdk.utils.SpUtil;
 
 public class SDKCore {
@@ -20,6 +22,7 @@ public class SDKCore {
     public SDKCore(Context context){
         this.context=context;
         resetData();
+        initJpush();
     }
 
     public static SDKCore getInstance(Context context){
@@ -74,7 +77,7 @@ public class SDKCore {
 
     }
 
-    public void initJpush() {
+    private void initJpush() {
         Bundle bundle = new Bundle();
         // 设置心跳3s
         bundle.putInt("heartbeat_interval", 3);
@@ -82,5 +85,9 @@ public class SDKCore {
 
         JPushInterface.setDebugMode(true);
         JPushInterface.init(context);
+    }
+
+    public void Login(String cardNo) {
+        DoHttpManager.getInstance().auth(context, cardNo);
     }
 }

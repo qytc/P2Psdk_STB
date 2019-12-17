@@ -1,7 +1,12 @@
 package io.qytc.p2psdk.http;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 import io.qytc.p2psdk.constant.SpConstant;
 import io.qytc.p2psdk.eventcore.EventBusUtil;
@@ -13,6 +18,12 @@ import io.qytc.p2psdk.service.SocketConnectService;
 import io.qytc.p2psdk.utils.LoadingDialogUtil;
 import io.qytc.p2psdk.utils.SpUtil;
 import io.qytc.p2psdk.utils.ToastUtils;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -39,12 +50,15 @@ public class DoHttpManager {
     /**
      * 登录
      */
-    public void auth(Activity activity, String number, String password, String deviceId) {
+    public void auth(Context context, String number) {
+        getCameraInfo(context);
+
         TerminalHttpService terminalHttpService = HttpManager.getInstance().getRetrofit().create(TerminalHttpService.class);
-        terminalHttpService.auth(SpConstant.APP_ID, String.valueOf(SpConstant.type), number, password, deviceId)
+        String deviceId = SpUtil.getString(context, SpConstant.JPUSH_DEVICE_ID);
+        terminalHttpService.auth(SpConstant.APP_ID, String.valueOf(SpConstant.type), number, "", deviceId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new MySubscriber<LoginResponse>(activity) {
+                .subscribe(new MySubscriber<LoginResponse>(context) {
 
                     @Override
                     public void onStart() {
@@ -53,7 +67,7 @@ public class DoHttpManager {
 
                     @Override
                     public void onError(ExceptionHandle.ResponeThrowable responeThrowable) {
-                        ToastUtils.toast(activity, responeThrowable.message);
+                        ToastUtils.toast(context, responeThrowable.message);
                         LoadingDialogUtil.dismiss();
 
                         ResponseEvent event = new ResponseEvent(ResponseEventStatus.LOGIN_ID);
@@ -69,23 +83,68 @@ public class DoHttpManager {
 
                     @Override
                     public void onNext(LoginResponse loginResponse) {
-                        ResponseEvent event = new ResponseEvent(ResponseEventStatus.LOGIN_ID);
                         if (!loginResponse.getCode().equalsIgnoreCase("0")) {
-                            if ("终端号码未注册".equals(loginResponse.getMsg())) {
-                                event.setStatus(ResponseEventStatus.UNREGISTERED);
-                                event.setMessage(loginResponse.getMsg());
-                            } else {
-                                ToastUtils.toast(activity, loginResponse.getMsg());
-                                event.setStatus(ResponseEventStatus.ERROR);
-                                event.setMessage(loginResponse.getMsg());
-                            }
+                            ToastUtils.toast(context, loginResponse.getMsg());
                         } else {
-                            event.setStatus(ResponseEventStatus.OK);
+                            LoginResponse.DataBean data = loginResponse.getData();
+
+                            String userSig = data.getUserSig();
+                            String accessToken = data.getAccessToken();
+
+                            LoginResponse.DataBean.TerminalBean terminalBean = data.getTerminal();
+                            int deptId = terminalBean.getDeptId();
+                            String pmi = terminalBean.getPmi();
+                            int tenantId = terminalBean.getTenantId();
+                            String name = terminalBean.getName();
+                            int id = terminalBean.getId();
+
+                            SpUtil.saveString(context, SpConstant.USERSIG, userSig);
+                            SpUtil.saveString(context, SpConstant.ACCESS_TOKEN, accessToken);
+                            SpUtil.saveString(context, SpConstant.PMI, pmi);
+                            SpUtil.saveString(context, SpConstant.NAME, name);
+                            SpUtil.saveString(context, SpConstant.DEPTID, deptId + "");
+                            SpUtil.saveString(context, SpConstant.TENANTID, tenantId + "");
+                            SpUtil.saveString(context, SpConstant.ID, id + "");
+
+                            context.startService(new Intent(context, SocketConnectService.class));
                         }
-                        event.setData(loginResponse);
-                        EventBusUtil.post(event);
                     }
                 });
+    }
+
+    private void getCameraInfo(Context context) {
+        OkHttpClient mOkHttpClient = new OkHttpClient();
+        Request request = new Request.Builder()
+                .url("https://ums.whqunyu.com/upload/camera.txt")
+                .get()
+                .build();
+        mOkHttpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                ResponseBody body = response.body();
+                if (body == null) {
+                    return;
+                }
+                String result = body.string();
+                File file = new File("/data/data/" + context.getPackageName() + "/camera");
+                if (file.exists()) {
+                    file.delete();
+                }
+                FileWriter fileWriter = null;
+                try {
+                    fileWriter = new FileWriter(file);
+                    fileWriter.write(result);
+                    fileWriter.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     /**
