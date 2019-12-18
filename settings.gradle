@@ -1,2 +1,1 @@
 include ':app', ':p2psdk', ':gst_core', ':gst_support'
-rootProject.name='P2PCall_stb'
