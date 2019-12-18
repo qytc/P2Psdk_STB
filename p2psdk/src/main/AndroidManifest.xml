@@ -41,7 +41,7 @@
             android:value="31ca00fa90b4732ff64f886b" />
 
         <activity
-            android:name="io.qytc.p2psdk.activity.HomeActivity"
+            android:name="io.qytc.p2psdk.io.qytc.vc.HomeActivity"
             android:launchMode="singleInstance"
             android:screenOrientation="landscape" />
         <activity

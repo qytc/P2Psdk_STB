@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import io.qytc.p2psdk.activity.ActivityCall;
 import io.qytc.p2psdk.constant.SpConstant;
 import io.qytc.p2psdk.eventcore.EventBusUtil;
 import io.qytc.p2psdk.eventcore.ResponseEvent;
@@ -150,10 +151,10 @@ public class DoHttpManager {
     /**
      * 呼叫联系人
      */
-    public void p2pCall(Activity activity, String pmi) {
+    public void p2pCall(Activity activity, String targetNumber) {
         TerminalHttpService terminalHttpService = HttpManager.getInstance().getRetrofit().create(TerminalHttpService.class);
         String accessToken = SpUtil.getString(activity, SpConstant.ACCESS_TOKEN);
-        terminalHttpService.p2pCall(pmi, accessToken)
+        terminalHttpService.p2pCall(targetNumber, accessToken)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new MySubscriber<CreatConfResponse>(activity) {
@@ -184,10 +185,17 @@ public class DoHttpManager {
                             SocketConnectService.getInstance().sendALiveData();
                             ToastUtils.toast(activity, creatConfResponse.getMsg());
                         } else {
-                            ResponseEvent event = new ResponseEvent(ResponseEventStatus.CREAT_P2PCALL);
-                            event.setStatus(ResponseEventStatus.OK);
-                            event.setData(creatConfResponse);
-                            EventBusUtil.post(event);
+                            CreatConfResponse.DataBean data = creatConfResponse.getData();
+                            String pmi = data.getConference().getPmi();
+
+                            SpUtil.saveString(activity, SpConstant.INROOM, "1");
+                            SpUtil.saveString(activity, SpConstant.JOIN_PMI, pmi);
+
+                            Intent intent = new Intent(activity, ActivityCall.class);
+                            intent.putExtra(ActivityCall.ROOM_PMI, pmi);
+                            intent.putExtra(ActivityCall.CALL_TYPE, ActivityCall.CALL_OUT);
+                            intent.putExtra(ActivityCall.TARGET_PMI, targetNumber);
+                            activity.startActivity(intent);
                         }
                     }
                 });

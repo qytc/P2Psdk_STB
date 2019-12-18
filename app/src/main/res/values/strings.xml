@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">P2PCallDemo_STB</string>
+    <string name="please_input_number">请输入对方号码</string>
+    <string name="target_number">对方号码:</string>
+    <string name="person_number">个人号码:</string>
+    <string name="call">呼叫</string>
 </resources>
