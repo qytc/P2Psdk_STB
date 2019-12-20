@@ -37,17 +37,13 @@ android {
 //            path file('src/main/cpp/CMakeLists.txt')
 //        }
 //    }
+
+
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-
+    implementation fileTree(dir: 'libs', include: ['*.jar','*.aar'])
     implementation 'androidx.appcompat:appcompat:1.1.0'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.2.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-
-    implementation files('libs/eventbus.jar')
 
     //fastjson
     implementation 'com.alibaba:fastjson:1.2.58'
@@ -55,7 +51,6 @@ dependencies {
     implementation ('io.socket:socket.io-client:1.0.0') {
         exclude group: 'org.json', module: 'json'
     }
-
 
     implementation ('io.socket:socket.io-client:1.0.0') {
         exclude group: 'org.json', module: 'json'
@@ -68,7 +63,4 @@ dependencies {
     /*rx-android-java*/
     implementation 'com.trello:rxlifecycle:1.0'
     implementation 'com.trello:rxlifecycle-components:1.0'
-    implementation project(path: ':gst_core')
-    implementation project(path: ':gst_support')
-
 }
