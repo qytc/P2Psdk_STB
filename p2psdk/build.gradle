@@ -41,8 +41,13 @@ android {
 
 }
 
+repositories {
+    flatDir {
+        dirs "libs"
+    }
+}
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar','*.aar'])
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.1.0'
 
     //fastjson
@@ -63,4 +68,7 @@ dependencies {
     /*rx-android-java*/
     implementation 'com.trello:rxlifecycle:1.0'
     implementation 'com.trello:rxlifecycle-components:1.0'
+    implementation(name: 'gst_core',ext: 'aar')
+    implementation(name: 'gst_support',ext: 'aar')
+
 }
