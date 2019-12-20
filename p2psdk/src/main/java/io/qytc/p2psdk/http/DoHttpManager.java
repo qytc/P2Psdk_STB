@@ -56,7 +56,7 @@ public class DoHttpManager {
 
         TerminalHttpService terminalHttpService = HttpManager.getInstance().getRetrofit().create(TerminalHttpService.class);
         String deviceId = SpUtil.getString(context, SpConstant.JPUSH_DEVICE_ID);
-        terminalHttpService.auth(SpConstant.APP_ID, String.valueOf(SpConstant.type), number, "", deviceId)
+        terminalHttpService.auth(SpConstant.APP_ID, String.valueOf(SpConstant.type), number, number, deviceId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new MySubscriber<LoginResponse>(context) {
