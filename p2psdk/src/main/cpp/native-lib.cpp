@@ -17,65 +17,82 @@ using  namespace std;
 #define LOGF(...) __android_log_print(ANDROID_LOG_FATAL,LOG_TAG ,__VA_ARGS__) // 定义LOGF类型
 #endif
 
-bool checkHD(string dir_name,string device) {
-    // check the parameter
-    if (dir_name.empty()) {
-        LOGE("dir_name is null !");
-        return false;
-    }
-    DIR *dir = opendir(dir_name.c_str());
-    // check is dir ?
-    if (NULL == dir) {
-        LOGE("Can not open dir. Check path or permission!");
-        return false;
-    }
-    struct dirent *file;
-    // read all the files in dir
-    while ((file = readdir(dir)) != NULL) {
-        // skip "." and ".."
-        if (strcmp(file->d_name, ".") == 0 || strcmp(file->d_name, "..") == 0) {
-            continue;
+//字符串分割到数组
+void Split(const string &src, const string &separator, vector<string> &dest) {
+    string str = src;
+    string substring;
+    string::size_type start = 0, index;
+    dest.clear();
+    index = str.find_first_of(separator, start);
+    do {
+        if (index != string::npos) {
+            substring = str.substr(start, index - start);
+            dest.push_back(substring);
+            start = index + separator.size();
+            index = str.find(separator, start);
+            if (start == string::npos) break;
         }
-        if (file->d_type == DT_DIR) {
-            string filePath = dir_name + "/" + file->d_name;
-            checkHD(filePath,device); // 递归执行
-        } else {
-            auto path=dir_name + "/" + file->d_name+"/uevent";
+    } while (index != string::npos);
 
-            ifstream in(path, ios::in);
-            istreambuf_iterator<char> beg(in), end;
-            string strdata(beg, end);
-            in.close();
-            if(strdata==""){
-                LOGD("camera file is empty");
-                return false;
-            }
-            string line= strdata.substr(strdata.find("PRODUCT=")+8);
-            line=line.substr(0,line.find("TYPE=")-1);
-            LOGD("%s",line.c_str());
-            if(device.find(line) != std::string::npos){
-                LOGD("checkHD success");
-                return true;
-            }
+    //the last part
+    substring = str.substr(start);
+    dest.push_back(substring);
+}
+
+#define LOG_TAG  "qytc-lib"
+#define LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
+
+string execCmd(const char *cmd) {
+    //执行busybox lsusb获取usb设备
+    FILE *fp = popen(cmd, "r");
+    string usb = string();
+    char buff1[10000];
+
+    while (fgets(buff1, sizeof(buff1) - 1, fp) != NULL) {
+        string s = string(buff1);
+        usb += (s.substr(0, s.length() - 1) + ",");
+    }
+    pclose(fp);
+    return usb;
+}
+
+bool compare(FILE *file, string usbinfo) {
+    char buff2[100000];
+    fgets(buff2, sizeof(buff2) - 1, file);
+    fclose(file);
+    //循环遍历判断
+    vector<string> support;
+    Split(buff2, ",", support);
+    for (int i = 0; i < support.size(); i++) {
+        string sd = support[i];
+        sd = sd.substr(0, sd.length() - 1);
+        if (usbinfo.find(sd.c_str()) != string::npos) {
+            return true;
         }
     }
-    closedir(dir);
-    LOGD("closedir");
     return false;
 }
+
+
 
 extern "C" JNIEXPORT bool JNICALL
 Java_io_qytc_p2psdk_utils_Check_supportHD(
         JNIEnv *env, jclass clazz) {
-
-    ifstream in("/sdcard/camera.txt", ios::in);
-    istreambuf_iterator<char> beg(in), end;
-    string camera(beg, end);
-    if(camera == ""){
-        return false;
+    //加载支持的摄像头
+    FILE *file;
+    file = fopen("/data/data/io.qytc.vc/camera", "re");
+    if (file == nullptr) {
+        return static_cast<jboolean>(false);
     }
-    in.close();
 
-    std::string dirPath="/sys/bus/usb/devices";
-    return checkHD(dirPath,camera);
+    string devices = execCmd("cat /proc/bus/input/devices | grep Vendor");
+    bool result = compare(file, devices);
+    if(result){
+        return static_cast<jboolean>(true);
+    } else{
+        string lsusb = execCmd("busybox lsusb");
+        result = compare(file, lsusb);
+        return static_cast<jboolean>(result);
+    }
+
 }

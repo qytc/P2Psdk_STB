@@ -134,6 +134,8 @@ public class ActivityVideo extends Activity {
 
             activity.mTrtcCloud.stopRemoteView(userId);
             activity.videoLayout.onMemberLeave(userId);
+
+            activity.exitRoom();
         }
 
         /**

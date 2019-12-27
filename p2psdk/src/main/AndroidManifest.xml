@@ -4,4 +4,5 @@
     package="io.qytc.p2psdk"
     android:testOnly="false">
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 </manifest>
