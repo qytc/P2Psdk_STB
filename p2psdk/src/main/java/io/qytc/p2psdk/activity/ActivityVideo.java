@@ -47,7 +47,7 @@ public class ActivityVideo extends Activity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_video);
 
         mActivity = this;
@@ -134,7 +134,7 @@ public class ActivityVideo extends Activity {
 
             activity.mTrtcCloud.stopRemoteView(userId);
             activity.videoLayout.onMemberLeave(userId);
-
+            ToastUtils.toast(activity, "对方已退出通话");
             activity.exitRoom();
         }
 
