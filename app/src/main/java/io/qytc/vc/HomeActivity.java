@@ -9,8 +9,10 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import io.qytc.p2psdk.SDKCore;
 import io.qytc.p2psdk.constant.SpConstant;
 import io.qytc.p2psdk.http.DoHttpManager;
+import io.qytc.p2psdk.utils.CmdUtil;
 import io.qytc.p2psdk.utils.SpUtil;
 import io.qytc.p2psdk.utils.ToastUtils;
 
@@ -25,6 +27,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        String cardNo =CmdUtil.getCardNo();//获取卡号
+        SDKCore.getInstance(this).Login(cardNo);//登陆
 
         initView();
     }
