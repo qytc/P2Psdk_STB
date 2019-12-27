@@ -231,11 +231,14 @@ public class DoHttpManager {
 
                     @Override
                     public void onNext(BaseResponse baseResponse) {
+                        ResponseEvent event = new ResponseEvent(ResponseEventStatus.CALL_ACCEPT);
                         if (baseResponse.getCode().equalsIgnoreCase("0")) {
-                            ResponseEvent event = new ResponseEvent(ResponseEventStatus.CALL_ACCEPT);
                             event.setStatus(ResponseEventStatus.OK);
-                            EventBusUtil.post(event);
+                        } else {
+                            event.setStatus(ResponseEventStatus.ERROR);
                         }
+                        event.setMessage(baseResponse.getMsg());
+                        EventBusUtil.post(event);
                     }
                 });
     }

@@ -136,9 +136,9 @@ public class ActivityCall extends Activity implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-        if(view.getId()==R.id.iv_accept){
+        if (view.getId() == R.id.iv_accept) {
             DoHttpManager.getInstance().acceptCall(this, mRoomPmi);
-        }else if(view.getId()==R.id.iv_hangup){
+        } else if (view.getId() == R.id.iv_hangup) {
             if (mCall_type == CALL_IN) {
                 DoHttpManager.getInstance().refuseCall(this, mRoomPmi);
             } else {
@@ -158,14 +158,17 @@ public class ActivityCall extends Activity implements View.OnClickListener {
     }
 
     public void onEventMainThread(ResponseEvent event) {
-        if (event == null || event.getStatus() != ResponseEventStatus.OK) {
+        if (event == null) {
             return;
         }
 
-        switch (event.getId()) {
-            case ResponseEventStatus.CALL_ACCEPT:
+        if (event.getId() == ResponseEventStatus.CALL_ACCEPT) {
+            if (event.getStatus() == ResponseEventStatus.OK) {
                 acceptCall();
-                break;
+            } else {
+                ToastUtils.toast(ActivityCall.this, event.getMessage());
+                cancelCall();
+            }
         }
     }
 
