@@ -81,7 +81,6 @@
                 <action android:name="cn.jiguang.user.service.action" />
             </intent-filter>
         </service>
-        <service android:name="io.qytc.p2psdk.service.SocketConnectService" />
         <!-- User defined.  For test only  用户自定义的广播接收器-->
         <receiver
             android:name="io.qytc.p2psdk.receiver.MsgReceiver"

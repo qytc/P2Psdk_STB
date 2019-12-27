@@ -15,7 +15,7 @@ import io.qytc.p2psdk.eventcore.ResponseEvent;
 import io.qytc.p2psdk.http.response.BaseResponse;
 import io.qytc.p2psdk.http.response.CreatConfResponse;
 import io.qytc.p2psdk.http.response.LoginResponse;
-import io.qytc.p2psdk.service.SocketConnectService;
+import io.qytc.p2psdk.service.SocketHelper;
 import io.qytc.p2psdk.utils.LoadingDialogUtil;
 import io.qytc.p2psdk.utils.SpUtil;
 import io.qytc.p2psdk.utils.ToastUtils;
@@ -107,7 +107,9 @@ public class DoHttpManager {
                             SpUtil.saveString(context, SpConstant.TENANTID, tenantId + "");
                             SpUtil.saveString(context, SpConstant.ID, id + "");
 
-                            context.startService(new Intent(context, SocketConnectService.class));
+                            SocketHelper.getInstance().stop();
+
+                            SocketHelper.getInstance().start(context.getApplicationContext());
                         }
                     }
                 });
@@ -163,14 +165,14 @@ public class DoHttpManager {
                     public void onStart() {
                         super.onStart();
                         SpUtil.saveString(activity, SpConstant.INROOM, "2");
-                        SocketConnectService.getInstance().sendALiveData();
+                        SocketHelper.getInstance().sendALiveData();
                     }
 
                     @Override
                     public void onError(ExceptionHandle.ResponeThrowable responseThrowable) {
                         ToastUtils.toast(activity, responseThrowable.message);
                         SpUtil.saveString(activity, SpConstant.INROOM, "0");
-                        SocketConnectService.getInstance().sendALiveData();
+                        SocketHelper.getInstance().sendALiveData();
                     }
 
                     @Override
@@ -182,7 +184,7 @@ public class DoHttpManager {
                     public void onNext(CreatConfResponse creatConfResponse) {
                         if (!creatConfResponse.getCode().equalsIgnoreCase("0")) {
                             SpUtil.saveString(activity, SpConstant.INROOM, "0");
-                            SocketConnectService.getInstance().sendALiveData();
+                            SocketHelper.getInstance().sendALiveData();
                             ToastUtils.toast(activity, creatConfResponse.getMsg());
                         } else {
                             CreatConfResponse.DataBean data = creatConfResponse.getData();
@@ -256,7 +258,7 @@ public class DoHttpManager {
 
                     @Override
                     public void onError(ExceptionHandle.ResponeThrowable responseThrowable) {
-                        SocketConnectService.getInstance().sendALiveData();
+                        ToastUtils.toast(activity, responseThrowable.message);
                     }
 
                     @Override
@@ -289,7 +291,7 @@ public class DoHttpManager {
 
                     @Override
                     public void onError(ExceptionHandle.ResponeThrowable responseThrowable) {
-
+                        ToastUtils.toast(activity, responseThrowable.message);
                     }
 
                     @Override
