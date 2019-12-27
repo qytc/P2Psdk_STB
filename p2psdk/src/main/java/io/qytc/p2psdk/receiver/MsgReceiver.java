@@ -7,12 +7,10 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
 import cn.jpush.android.api.JPushInterface;
-
 import io.qytc.p2psdk.activity.ActivityCall;
 import io.qytc.p2psdk.bean.ConfBean;
 import io.qytc.p2psdk.constant.SpConstant;
@@ -72,9 +70,6 @@ public class MsgReceiver extends BroadcastReceiver {
             case "inviteJoinConf":
                 joinCof(extra);
                 break;
-            case "refuseCall":
-                refuseCall(extra);
-                break;
             case "acceptCall":
                 acceptCall(extra);
                 break;
@@ -99,17 +94,6 @@ public class MsgReceiver extends BroadcastReceiver {
         intent.putExtra(ActivityCall.ROOM_PMI, bean.getPmi());
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mContext.startActivity(intent);
-    }
-
-    private void refuseCall(JSONObject extra) {
-        String inrRom = SpUtil.getString(mContext, SpConstant.INROOM);
-        if (!"2".equals(inrRom)) return;
-
-        String pmi = extra.getString("pmi");
-        UIEvent event = new UIEvent(UIEventStatus.JPUSH_REFUSE_CALL);
-        event.setStatus(UIEventStatus.OK);
-        event.setData(pmi);
-        EventBusUtil.post(event);
     }
 
     private void acceptCall(JSONObject extra) {

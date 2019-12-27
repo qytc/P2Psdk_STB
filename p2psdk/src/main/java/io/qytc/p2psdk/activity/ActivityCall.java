@@ -53,14 +53,14 @@ public class ActivityCall extends Activity implements View.OnClickListener {
     }
 
     private void initData() {
-        SpUtil.saveString(this, SpConstant.INROOM, "2");
-        SpUtil.saveString(this, SpConstant.JOIN_PMI, "0");
-
         Intent intent = getIntent();
         mCall_type = intent.getIntExtra(CALL_TYPE, CALL_OUT);
         mTargetName = intent.getStringExtra(TARGET_NAME);
         mRoomPmi = intent.getStringExtra(ROOM_PMI);
         mTargetPmi = intent.getStringExtra(TARGET_PMI);
+
+        SpUtil.saveString(this, SpConstant.INROOM, "2");
+        SpUtil.saveString(this, SpConstant.JOIN_PMI, mRoomPmi);
 
         mHandler.postDelayed(mTimeOutRunnable, 30 * 1000);
     }
@@ -93,7 +93,7 @@ public class ActivityCall extends Activity implements View.OnClickListener {
     private Runnable mTimeOutRunnable = new Runnable() {
         @Override
         public void run() {
-            DoHttpManager.getInstance().refuseCall(ActivityCall.this, mRoomPmi);
+            DoHttpManager.getInstance().endP2PCall(ActivityCall.this, mRoomPmi);
             cancelCall();
         }
     };
@@ -139,11 +139,7 @@ public class ActivityCall extends Activity implements View.OnClickListener {
         if (view.getId() == R.id.iv_accept) {
             DoHttpManager.getInstance().acceptCall(this, mRoomPmi);
         } else if (view.getId() == R.id.iv_hangup) {
-            if (mCall_type == CALL_IN) {
-                DoHttpManager.getInstance().refuseCall(this, mRoomPmi);
-            } else {
-                DoHttpManager.getInstance().endP2PCall(this, mRoomPmi);
-            }
+            DoHttpManager.getInstance().endP2PCall(this, mRoomPmi);
             cancelCall();
         }
     }
@@ -151,7 +147,7 @@ public class ActivityCall extends Activity implements View.OnClickListener {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            DoHttpManager.getInstance().refuseCall(ActivityCall.this, mRoomPmi);
+            DoHttpManager.getInstance().endP2PCall(ActivityCall.this, mRoomPmi);
             cancelCall();
         }
         return super.onKeyDown(keyCode, event);
@@ -179,9 +175,11 @@ public class ActivityCall extends Activity implements View.OnClickListener {
 
         switch (event.getId()) {
             case UIEventStatus.END_CONF:
-                cancelCall();
-            case UIEventStatus.JPUSH_REFUSE_CALL:
-                ToastUtils.toast(ActivityCall.this, R.string.target_user_is_busy);
+                if (mCall_type == CALL_IN) {
+                    ToastUtils.toast(ActivityCall.this, R.string.target_cancel_call);
+                } else {
+                    ToastUtils.toast(ActivityCall.this, R.string.target_user_is_busy);
+                }
                 cancelCall();
                 break;
             case UIEventStatus.JPUSH_ACCEPT_CALL:
