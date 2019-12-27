@@ -231,44 +231,14 @@ public class DoHttpManager {
 
                     @Override
                     public void onNext(BaseResponse baseResponse) {
+                        ResponseEvent event = new ResponseEvent(ResponseEventStatus.CALL_ACCEPT);
                         if (baseResponse.getCode().equalsIgnoreCase("0")) {
-                            ResponseEvent event = new ResponseEvent(ResponseEventStatus.CALL_ACCEPT);
                             event.setStatus(ResponseEventStatus.OK);
-                            EventBusUtil.post(event);
+                        } else {
+                            event.setStatus(ResponseEventStatus.ERROR);
                         }
-                    }
-                });
-    }
-
-    /**
-     * 拒绝接听
-     */
-    public void refuseCall(Activity activity, String pmi) {
-        TerminalHttpService terminalHttpService = HttpManager.getInstance().getRetrofit().create(TerminalHttpService.class);
-        String accessToken = SpUtil.getString(activity, SpConstant.ACCESS_TOKEN);
-        terminalHttpService.refuseCall(pmi, accessToken)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new MySubscriber<BaseResponse>(activity) {
-
-                    @Override
-                    public void onStart() {
-                        super.onStart();
-                    }
-
-                    @Override
-                    public void onError(ExceptionHandle.ResponeThrowable responseThrowable) {
-                        ToastUtils.toast(activity, responseThrowable.message);
-                    }
-
-                    @Override
-                    public void onCompleted() {
-                        super.onCompleted();
-                    }
-
-                    @Override
-                    public void onNext(BaseResponse baseResponse) {
-
+                        event.setMessage(baseResponse.getMsg());
+                        EventBusUtil.post(event);
                     }
                 });
     }
