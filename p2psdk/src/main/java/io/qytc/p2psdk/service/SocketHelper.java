@@ -1,6 +1,5 @@
 package io.qytc.p2psdk.service;
 
-import android.app.Application;
 import android.content.Context;
 import android.os.Handler;
 import android.text.TextUtils;
@@ -28,7 +27,6 @@ public class SocketHelper {
     private Context mContext;
     private Handler mHandler;
     private Socket mSocket;
-    private int connectErrorCount = 0;//连接失败次数
     private boolean isLinked = false;//连接状态
 
     public static SocketHelper getInstance() {
@@ -87,6 +85,11 @@ public class SocketHelper {
 
     private void close() {
         if (mSocket != null) {
+            mSocket.off(Socket.EVENT_CONNECT, connectListener);
+            mSocket.off(Socket.EVENT_DISCONNECT, disconnectListener);
+            mSocket.off(Socket.EVENT_CONNECT_ERROR, connectErrorListener);
+            mSocket.off(Socket.EVENT_CONNECT_TIMEOUT, connectTimeOutListener);
+
             mSocket.close();
             mSocket.disconnect();
         }
@@ -94,10 +97,7 @@ public class SocketHelper {
 
     private void removeSocketListener() {
         if (mSocket == null) return;
-        mSocket.off(Socket.EVENT_CONNECT, connectListener);
-        mSocket.off(Socket.EVENT_DISCONNECT, disconnectListener);
-        mSocket.off(Socket.EVENT_CONNECT_ERROR, connectErrorListener);
-        mSocket.off(Socket.EVENT_CONNECT_TIMEOUT, connectTimeOutListener);
+
         mSocket.off(EventConst.HANGUP, onEndConf);
         mSocket.off(EventConst.CONF_AUTO_CLOSE_NOTICE, onConfAutoCloseNotice);
     }
@@ -106,10 +106,14 @@ public class SocketHelper {
         Log.i(TAG, "connect success");
         initSocketListener();
         isLinked = true;
-        connectErrorCount = 0;
     };
 
-    private Emitter.Listener disconnectListener = args -> isLinked = false;
+    private Emitter.Listener disconnectListener = args -> {
+        Log.i(TAG, "socket disconnect");
+        removeSocketListener();
+        isLinked = false;
+    };
+
     private Emitter.Listener connectErrorListener = args -> isLinked = false;
     private Emitter.Listener connectTimeOutListener = args -> isLinked = false;
 
